@@ -13,4 +13,6 @@ class TodoActivity : ItemActivity() {
 
     override val tag: String
         get() = "ToDo Activity"
+
+    override fun getActivityTitle() = R.string.app_name
 }

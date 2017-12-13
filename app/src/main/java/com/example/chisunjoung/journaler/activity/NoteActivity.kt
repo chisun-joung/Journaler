@@ -13,4 +13,6 @@ class NoteActivity : ItemActivity() {
 
     override val tag: String
         get() = "Note Activity"
+
+    override fun getActivityTitle() = R.string.app_name
 }
