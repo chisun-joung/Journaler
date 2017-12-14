@@ -4,7 +4,6 @@ package com.example.chisunjoung.journaler.activity
 import android.os.Bundle
 import com.example.chisunjoung.journaler.R
 import com.example.chisunjoung.journaler.fragment.ItemsFragment
-
 /**
  * Created by chisunjoung on 12/12/2017.
  */
@@ -23,5 +22,6 @@ class MainActivity : BaseActivity() {
                 .add(R.id.fragment_container, fragment)
                 .commit()
     }
+
 
 }

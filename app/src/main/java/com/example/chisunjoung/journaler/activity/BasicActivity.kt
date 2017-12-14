@@ -3,7 +3,7 @@ package com.example.chisunjoung.journaler.activity
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.util.Log
-import kotlinx.android.synthetic.main.acvivity_header.*
+import kotlinx.android.synthetic.main.activity_header.*
 
 /**
  * Created by chisunjoung on 13/12/2017.

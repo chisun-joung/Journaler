@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/acvivity_header" />
+        <include layout="@layout/activity_header" />
 
         <EditText
             android:id="@+id/todo_title"
