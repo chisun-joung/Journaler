@@ -1,16 +1,18 @@
 package com.example.chisunjoung.journaler.activity
 
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import kotlinx.android.synthetic.main.activity_header.*
+import android.view.Menu
+import com.example.chisunjoung.journaler.R
+import kotlinx.android.synthetic.main.activity_main.*
 
 /**
  * Created by chisunjoung on 13/12/2017.
  */
 
 
-abstract class BaseActivity : FragmentActivity() {
+abstract class BaseActivity : AppCompatActivity() {
     protected abstract val tag : String
     protected abstract fun getLayout(): Int
     protected abstract fun getActivityTitle(): Int
@@ -18,7 +20,7 @@ abstract class BaseActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(getLayout())
-        activity_title.setText(getActivityTitle())
+        setSupportActionBar(toolbar)
         Log.v(tag, "[ ON CREATE ]")
     }
 
@@ -27,6 +29,10 @@ abstract class BaseActivity : FragmentActivity() {
         Log.v(tag, "[ ON POST CREATE ]")
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return true
+    }
     override fun onRestart() {
         super.onRestart()
         Log.v(tag, "[ ON RESTART ]")
