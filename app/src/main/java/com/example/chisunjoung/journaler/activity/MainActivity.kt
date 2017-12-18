@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
+import android.support.v4.view.GravityCompat
 import android.util.Log
 import android.view.MenuItem
 import com.example.chisunjoung.journaler.R
 import com.example.chisunjoung.journaler.fragment.ItemsFragment
+import com.example.chisunjoung.journaler.navigation.NavigationDrawerAdapter
 import com.example.chisunjoung.journaler.navigation.NavigationDrawerItem
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -55,6 +57,16 @@ class MainActivity : BaseActivity() {
                 }
         )
 
+        menuItems.add(today)
+        menuItems.add(next7Days)
+        menuItems.add(todos)
+        menuItems.add(notes)
+
+        val navgationDrawAdapter =
+                NavigationDrawerAdapter(this, menuItems)
+
+        left_drawer.adapter = navgationDrawAdapter
+
 
     }
 
@@ -62,6 +74,7 @@ class MainActivity : BaseActivity() {
         when (item.itemId) {
             R.id.drawing_menu -> {
                 Log.v(tag, "Main menu.")
+                drawer_layout.openDrawer(GravityCompat.START)
                 return true
             }
             R.id.options_menu -> {
