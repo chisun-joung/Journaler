@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.MenuItem
 import com.example.chisunjoung.journaler.R
 import com.example.chisunjoung.journaler.fragment.ItemsFragment
+import com.example.chisunjoung.journaler.navigation.NavigationDrawerItem
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -24,6 +25,37 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
        pager.adapter = ViewPagerAdapter(supportFragmentManager)
+
+        val menuItems = mutableListOf<NavigationDrawerItem>()
+        val today = NavigationDrawerItem(
+                getString(R.string.today),
+                Runnable {
+                    pager.setCurrentItem(0, true)
+                }
+        )
+
+        val next7Days = NavigationDrawerItem(
+                getString(R.string.next_seven_days),
+                Runnable {
+                    pager.setCurrentItem(1, true)
+                }
+        )
+
+        val todos = NavigationDrawerItem(
+                getString(R.string.todos),
+                Runnable {
+                    pager.setCurrentItem(2, true)
+                }
+        )
+
+        val notes = NavigationDrawerItem(
+                getString(R.string.notes),
+                Runnable {
+                    pager.setCurrentItem(3, true)
+                }
+        )
+
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
