@@ -1,5 +1,6 @@
 package com.example.chisunjoung.journaler.fragment
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -12,12 +13,16 @@ import com.example.chisunjoung.journaler.R
 import com.example.chisunjoung.journaler.activity.NoteActivity
 import com.example.chisunjoung.journaler.activity.TodoActivity
 import com.example.chisunjoung.journaler.model.MODE
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by chisunjoung on 14/12/2017.
  */
 
 class ItemsFragment : BaseFragement(){
+    private val TODO_REQUEST = 1
+    private val NOTE_REQUEST = 0
     override val logTag: String
         get() = "Items fragment"
 
@@ -59,12 +64,43 @@ class ItemsFragment : BaseFragement(){
 
     private fun openCreateNote(){
         val intent = Intent(context, NoteActivity::class.java)
-        intent.putExtra(MODE.EXTRAS_KEY, MODE.CREATE.mode)
-        startActivity(intent)
+        val data = Bundle()
+        data.putInt(MODE.EXTRAS_KEY, MODE.CREATE.mode)
+        intent.putExtras(data)
+        startActivityForResult(intent, NOTE_REQUEST)
     }
     private fun openCreateTodo(){
+        val date = Date(System.currentTimeMillis())
+        val dateFormat = SimpleDateFormat("MMM dd YYYY", Locale.ENGLISH)
+        val timeFormat = SimpleDateFormat("MM:HH", Locale.ENGLISH)
+
         val intent = Intent(context, TodoActivity::class.java)
-        intent.putExtra(MODE.EXTRAS_KEY, MODE.CREATE.mode)
-        startActivity(intent)
+        val data = Bundle()
+        data.putInt(MODE.EXTRAS_KEY, MODE.CREATE.mode)
+        data.putString(TodoActivity.EXTRA_DATE, dateFormat.format(date))
+        data.putString(TodoActivity.EXTRA_TIME, timeFormat.format(date))
+        intent.putExtras(data)
+        startActivityForResult(intent, TODO_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode) {
+            TODO_REQUEST -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.i(logTag, "We created new TODO.")
+                } else {
+                    Log.w(logTag, "We didn't created new TODO.")
+                }
+            }
+            NOTE_REQUEST -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.i(logTag, "We created new note.")
+                } else {
+                    Log.w(logTag, "We didn't created new note.")
+                }
+            }
+        }
+
     }
 }
