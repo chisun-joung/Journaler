@@ -22,7 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/title"
-            android:padding="@dimen/form_padding" />
+            android:padding="@dimen/form_padding"
+            style="@style/edit_text_transparent"/>
 
         <EditText
             android:id="@+id/note_content"
@@ -30,7 +31,8 @@
             android:layout_height="match_parent"
             android:gravity="top"
             android:hint="@string/your_note_content_goes_here"
-            android:padding="@dimen/form_padding" />
+            android:padding="@dimen/form_padding"
+            style="@style/edit_text_gery_text"/>
 
     </LinearLayout>
 </ScrollView>
