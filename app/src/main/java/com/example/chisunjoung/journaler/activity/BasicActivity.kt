@@ -1,9 +1,12 @@
 package com.example.chisunjoung.journaler.activity
 
+import android.app.Activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import com.example.chisunjoung.journaler.R
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -19,6 +22,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         setContentView(getLayout())
         setSupportActionBar(toolbar)
         Log.v(tag, "[ ON CREATE ]")
@@ -46,6 +50,8 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         Log.v(tag, "[ ON RESUME ]")
+        val animation = getAnimation(R.anim.top_to_bottom)
+        findViewById<android.support.v7.widget.Toolbar>(R.id.toolbar).startAnimation(animation)
     }
 
     override fun onPostResume() {
@@ -56,6 +62,8 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         Log.v(tag, "[ ON PAUSE ]")
+        val animation = getAnimation(R.anim.top_to_bottom)
+        findViewById<android.support.v7.widget.Toolbar>(R.id.toolbar).startAnimation(animation)
     }
 
     override fun onStop() {
@@ -68,4 +76,6 @@ abstract class BaseActivity : AppCompatActivity() {
         Log.v(tag, "[ ON DESTROY ]")
     }
 
+    fun Activity.getAnimation(animation: Int): Animation =
+            AnimationUtils.loadAnimation(this, animation)
 }
