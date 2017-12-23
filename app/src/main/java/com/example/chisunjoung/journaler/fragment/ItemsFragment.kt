@@ -1,5 +1,7 @@
 package com.example.chisunjoung.journaler.fragment
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.BounceInterpolator
 import com.example.chisunjoung.journaler.R
 import com.example.chisunjoung.journaler.activity.NoteActivity
 import com.example.chisunjoung.journaler.activity.TodoActivity
@@ -35,6 +39,7 @@ class ItemsFragment : BaseFragement(){
         val view = inflater?.inflate(getLayout(), container, false)
         val btn = view?.findViewById<FloatingActionButton>(R.id.new_item)
         btn?.setOnClickListener {
+            animate(btn)
             val items = arrayOf(
                     getString(R.string.todos),
                     getString(R.string.notes)
@@ -42,6 +47,8 @@ class ItemsFragment : BaseFragement(){
             val builder =
                     AlertDialog.Builder(this@ItemsFragment.context)
                             .setTitle(R.string.choose_a_type)
+                            .setCancelable(true)
+                            .setOnCancelListener { animate(btn, false) }
                             .setItems(
                                     items,
                                     {
@@ -102,5 +109,26 @@ class ItemsFragment : BaseFragement(){
             }
         }
 
+    }
+
+    private fun animate(btn: FloatingActionButton, expand: Boolean = true) {
+        val animation1 = ObjectAnimator.ofFloat(btn, "scaleX",
+                if(expand){ 1.5f } else { 1.0f })
+        animation1.duration = 2000
+        animation1.interpolator = BounceInterpolator()
+
+        val animation2 = ObjectAnimator.ofFloat(btn, "scaleY",
+                if(expand){ 1.5f } else { 1.0f })
+        animation2.duration = 2000
+        animation2.interpolator = BounceInterpolator()
+
+        val animation3 = ObjectAnimator.ofFloat(btn, "alpha",
+                if(expand){ 0.3f } else { 1.0f })
+        animation3.duration = 500
+        animation3.interpolator = AccelerateInterpolator()
+
+        val set = AnimatorSet()
+        set.play(animation1).with(animation2).before(animation3)
+        set.start()
     }
 }
