@@ -1,7 +1,10 @@
 package com.example.chisunjoung.journaler.activity
 
+import android.Manifest
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
@@ -9,6 +12,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.example.chisunjoung.journaler.R
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 /**
  * Created by chisunjoung on 13/12/2017.
@@ -16,6 +20,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 abstract class BaseActivity : AppCompatActivity() {
+    companion object {
+        val REQUEST_GPS = 0
+    }
+
     protected abstract val tag : String
     protected abstract fun getLayout(): Int
     protected abstract fun getActivityTitle(): Int
@@ -25,6 +33,7 @@ abstract class BaseActivity : AppCompatActivity() {
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         setContentView(getLayout())
         setSupportActionBar(toolbar)
+        requestGpsPermissions()
         Log.v(tag, "[ ON CREATE ]")
     }
 
@@ -78,4 +87,25 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun Activity.getAnimation(animation: Int): Animation =
             AnimationUtils.loadAnimation(this, animation)
+
+    private fun requestGpsPermissions() {
+        ActivityCompat.requestPermissions(
+                this@BaseActivity,
+                arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION ),
+                REQUEST_GPS ) }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == REQUEST_GPS) {
+            for (grantResult in grantResults) {
+                if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                    Log.i(tag, String.format(Locale.ENGLISH, "Permission granted [ %d ]", requestCode))
+                } else {
+                    Log.e(tag, String.format(Locale.ENGLISH, "Permission not granted [ %d ]", requestCode))
+                }
+            }
+        }
+
+    }
 }
