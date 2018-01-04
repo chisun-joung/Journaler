@@ -1,17 +1,21 @@
 package com.example.chisunjoung.journaler.activity
 
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.MenuItem
 import com.example.chisunjoung.journaler.R
 import com.example.chisunjoung.journaler.fragment.ItemsFragment
 import com.example.chisunjoung.journaler.navigation.NavigationDrawerAdapter
 import com.example.chisunjoung.journaler.navigation.NavigationDrawerItem
+import com.example.chisunjoung.journaler.preference.PreferencesConfiguration
+import com.example.chisunjoung.journaler.preference.PreferencesProvider
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -24,9 +28,33 @@ class MainActivity : BaseActivity() {
     override fun getLayout() = R.layout.activity_main
     override fun getActivityTitle() = R.string.app_name
 
+    private val keyPagePosition = "keyPagePosition"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       pager.adapter = ViewPagerAdapter(supportFragmentManager)
+
+        val provider = PreferencesProvider()
+        val config = PreferencesConfiguration("journaler_prefs", Context.MODE_PRIVATE)
+        val preferences = provider.obtain(config, this)
+        pager.adapter = ViewPagerAdapter(supportFragmentManager)
+        pager.addOnPageChangeListener(object :
+                ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+                // Ignore
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset:
+            Float, positionOffsetPixels: Int) {
+                // Ignore
+            }
+
+            override fun onPageSelected(position: Int) {
+                Log.v(tag, "Page [ $position ]")
+                preferences.edit().putInt(keyPagePosition, position).apply()
+            }
+        })
+
+        val pagerPosition = preferences.getInt(keyPagePosition, 0)
+        pager.setCurrentItem(pagerPosition, true)
 
         val menuItems = mutableListOf<NavigationDrawerItem>()
         val today = NavigationDrawerItem(
