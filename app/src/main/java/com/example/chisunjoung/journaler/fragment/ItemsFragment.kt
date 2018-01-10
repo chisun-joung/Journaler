@@ -2,6 +2,7 @@ package com.example.chisunjoung.journaler.fragment
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.BounceInterpolator
+import android.widget.ListView
 import com.example.chisunjoung.journaler.R
 import com.example.chisunjoung.journaler.activity.NoteActivity
 import com.example.chisunjoung.journaler.activity.TodoActivity
@@ -69,6 +71,18 @@ class ItemsFragment : BaseFragement(){
         return view
     }
 
+    @SuppressLint("ResourceAsColor")
+    override fun onResume() {
+        super.onResume()
+        val items = view?.findViewById<ListView>(R.id.items)
+        items?.let {
+            items.postDelayed({
+                if (!activity.isFinishing) {
+                    items.setBackgroundColor(R.color.grey_text_middle)
+                }
+            }, 3000)
+        }
+    }
     private fun openCreateNote(){
         val intent = Intent(context, NoteActivity::class.java)
         val data = Bundle()
