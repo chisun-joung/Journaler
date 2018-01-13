@@ -1,8 +1,12 @@
 package com.example.chisunjoung.journaler.activity
 
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
@@ -16,6 +20,7 @@ import com.example.chisunjoung.journaler.navigation.NavigationDrawerAdapter
 import com.example.chisunjoung.journaler.navigation.NavigationDrawerItem
 import com.example.chisunjoung.journaler.preference.PreferencesConfiguration
 import com.example.chisunjoung.journaler.preference.PreferencesProvider
+import com.example.chisunjoung.journaler.service.MainService
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -29,6 +34,35 @@ class MainActivity : BaseActivity() {
     override fun getActivityTitle() = R.string.app_name
 
     private val keyPagePosition = "keyPagePosition"
+
+    private var service: MainService? = null
+
+    private val synchronize: NavigationDrawerItem by lazy {
+        NavigationDrawerItem(
+                getString(R.string.synchronize),
+                Runnable { service?.synchronize() },
+                false
+        )
+    }
+
+    private val serviceConnection = object :ServiceConnection{
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            service = null
+            synchronize.enabled = false
+        }
+
+        override fun onServiceConnected(p0: ComponentName?, binder:
+        IBinder?) {
+            if (binder is MainService.MainServiceBinder) {
+                service = binder.getService()
+                service?.let {
+                    synchronize.enabled = true
+                }
+            }
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -89,6 +123,7 @@ class MainActivity : BaseActivity() {
         menuItems.add(next7Days)
         menuItems.add(todos)
         menuItems.add(notes)
+        menuItems.add(synchronize)
 
         val navgationDrawAdapter =
                 NavigationDrawerAdapter(this, menuItems)
@@ -96,6 +131,17 @@ class MainActivity : BaseActivity() {
         left_drawer.adapter = navgationDrawAdapter
 
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val intent = Intent(this, MainService::class.java)
+        bindService(intent, serviceConnection, android.content.Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unbindService(serviceConnection)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
