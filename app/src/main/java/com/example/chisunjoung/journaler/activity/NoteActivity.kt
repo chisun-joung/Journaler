@@ -1,21 +1,18 @@
 package com.example.chisunjoung.journaler.activity
 
+import android.content.Intent
 import android.location.Location
 import android.location.LocationListener
-import android.os.AsyncTask
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import android.util.Log
 import com.example.chisunjoung.journaler.R
-import com.example.chisunjoung.journaler.database.Db
-import com.example.chisunjoung.journaler.execution.TaskExecutor
 import com.example.chisunjoung.journaler.location.LocationProvider
+import com.example.chisunjoung.journaler.model.MODE
 import com.example.chisunjoung.journaler.model.Note
+import com.example.chisunjoung.journaler.service.DatabaseService
 import kotlinx.android.synthetic.main.activity_note.*
 
 /**
@@ -34,7 +31,6 @@ class NoteActivity : ItemActivity() {
 
     private var note : Note? = null
     private var location : Location? = null
-    private val executor = TaskExecutor.getInstance(1)
     private var handler: Handler? = null
     private val textWatcher = object : TextWatcher {
         override fun afterTextChanged(p0: Editable?) {
@@ -53,28 +49,14 @@ class NoteActivity : ItemActivity() {
                 val title = getNoteTitle()
                 val content = getNoteContent()
                 note = Note(title, content, p0)
-                executor.execute {
-                    val param = note
-                    var result = false
-                    param?.let { result = Db.NOTE.insert(param) > 0 }
-                    if (result) {
-                        Log.i(tag, "Note inserted.")
-                    } else {
-                        Log.e(tag, "Note not inserted.")
-                    }
-                    handler?.post {
-                        var color = R.color.vermilion
-                        if (result) {
-                            color = R.color.green
-                        }
-                        indicator.setBackgroundColor(
-                                ContextCompat.getColor(
-                                        this@NoteActivity,
-                                        color
-                                )
-                        )
-                    }
-                }
+                // Switching to intent service.
+                val dbIntent = Intent(this@NoteActivity,
+                        DatabaseService::class.java)
+                dbIntent.putExtra(DatabaseService.EXTRA_ENTRY, note)
+                dbIntent.putExtra(DatabaseService.EXTRA_OPERATION,
+                        MODE.CREATE.mode)
+                startService(dbIntent)
+                sendMessage(true)
 
             }
         }
@@ -85,7 +67,21 @@ class NoteActivity : ItemActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handler = Handler(Looper.getMainLooper())
+        handler = object : Handler(Looper.getMainLooper()){
+            override fun handleMessage(msg: Message?) {
+                msg?.let {
+                    var color = R.color.vermilion
+                    if (msg.arg1 > 0) {
+                        color = R.color.green
+                    }
+                    indicator.setBackgroundColor(ContextCompat.getColor(
+                            this@NoteActivity,
+                            color
+                    ))
+                }
+                super.handleMessage(msg)
+            }
+        }
         note_title.addTextChangedListener(textWatcher)
         note_content.addTextChangedListener(textWatcher)
     }
@@ -99,31 +95,26 @@ class NoteActivity : ItemActivity() {
         } else {
             note?.title = getNoteTitle()
             note?.message = getNoteContent()
-            executor.execute {
-                val param = note
-                var result = false
-                param?.let { result = Db.NOTE.update(param) > 0 }
-                if (result) {
-                    Log.i(tag, "Note updated.")
-                } else {
-                    Log.e(tag, "Note not updated.")
-                }
-
-                handler?.post {
-                    var color = R.color.vermilion
-                    if (result) {
-                        color = R.color.green
-                    }
-                    indicator.setBackgroundColor(
-                            ContextCompat.getColor(
-                            this@NoteActivity,
-                            color
-                    ))
-                }
-            }
+            // Switching to intent service.
+            val dbIntent = Intent(this@NoteActivity,
+                    DatabaseService::class.java)
+            dbIntent.putExtra(DatabaseService.EXTRA_ENTRY, note)
+            dbIntent.putExtra(DatabaseService.EXTRA_OPERATION,
+                    MODE.EDIT.mode)
+            startService(dbIntent)
+            sendMessage(true)
         }
     }
 
+    private fun sendMessage(result: Boolean) {
+        val msg = handler?.obtainMessage()
+        if (result) {
+            msg?.arg1 = 1
+        } else {
+            msg?.arg1 = 0
+        }
+        handler?.sendMessage(msg)
+    }
     private fun getNoteContent(): String {
         return note_content.text.toString()
     }
