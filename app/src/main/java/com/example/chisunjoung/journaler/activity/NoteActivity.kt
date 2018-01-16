@@ -1,6 +1,9 @@
 package com.example.chisunjoung.journaler.activity
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
 import android.location.LocationListener
 import android.os.*
@@ -8,7 +11,9 @@ import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.Log
 import com.example.chisunjoung.journaler.R
+import com.example.chisunjoung.journaler.database.Crud
 import com.example.chisunjoung.journaler.location.LocationProvider
 import com.example.chisunjoung.journaler.model.MODE
 import com.example.chisunjoung.journaler.model.Note
@@ -56,13 +61,23 @@ class NoteActivity : ItemActivity() {
                 dbIntent.putExtra(DatabaseService.EXTRA_OPERATION,
                         MODE.CREATE.mode)
                 startService(dbIntent)
-                sendMessage(true)
+                //sendMessage(true)
 
             }
         }
         override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {}
         override fun onProviderEnabled(p0: String?) {}
         override fun onProviderDisabled(p0: String?) {}
+    }
+
+    private val crudOperationListener = object : BroadcastReceiver(){
+        override fun onReceive(ctx: Context?, intent: Intent?) {
+            intent?.let {
+                val crudResultValue = intent.getIntExtra(Crud.BROADCAST_EXTRAS_KEY_CRUD_OPERATION_RESULT, 0)
+                sendMessage(crudResultValue == 1)
+            }
+
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +99,13 @@ class NoteActivity : ItemActivity() {
         }
         note_title.addTextChangedListener(textWatcher)
         note_content.addTextChangedListener(textWatcher)
+        val intentFilter = IntentFilter(Crud.BROADCAST_ACTION)
+        registerReceiver(crudOperationListener, intentFilter)
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(crudOperationListener)
+        super.onDestroy()
     }
 
     private fun updateNote() {
@@ -102,11 +124,12 @@ class NoteActivity : ItemActivity() {
             dbIntent.putExtra(DatabaseService.EXTRA_OPERATION,
                     MODE.EDIT.mode)
             startService(dbIntent)
-            sendMessage(true)
+            //sendMessage(true)
         }
     }
 
     private fun sendMessage(result: Boolean) {
+        Log.v(tag, "Crud operation result [ $result ]")
         val msg = handler?.obtainMessage()
         if (result) {
             msg?.arg1 = 1

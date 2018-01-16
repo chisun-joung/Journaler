@@ -3,6 +3,7 @@ package com.example.chisunjoung.journaler.service
 import android.app.IntentService
 import android.content.Intent
 import android.util.Log
+import com.example.chisunjoung.journaler.database.Crud
 import com.example.chisunjoung.journaler.database.Db
 import com.example.chisunjoung.journaler.model.MODE
 import com.example.chisunjoung.journaler.model.Note
@@ -49,6 +50,7 @@ class DatabaseService :
                         } else {
                             Log.e(tag, "Note not inserted.")
                         }
+                        broadcastResult(result)
                     }
                     MODE.EDIT.mode -> {
                         val result = Db.NOTE.update(note) > 0
@@ -57,6 +59,7 @@ class DatabaseService :
                         } else {
                             Log.e(tag, "Note not updated.")
                         }
+                        broadcastResult(result)
                     }
                     else -> {
                         Log.w(tag, "Unknown mode [ $operation ]")
@@ -68,6 +71,20 @@ class DatabaseService :
 
         }
 
+    }
+
+    private fun broadcastResult(result: Boolean) {
+        val intent = Intent()
+        intent.action = Crud.BROADCAST_ACTION
+        intent.putExtra(
+                Crud.BROADCAST_EXTRAS_KEY_CRUD_OPERATION_RESULT,
+                if (result) {
+                    1
+                } else {
+                    0
+                }
+        )
+        sendBroadcast(intent)
     }
 
 }
