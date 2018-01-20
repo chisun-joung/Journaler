@@ -130,6 +130,8 @@ class MainActivity : BaseActivity() {
 
         left_drawer.adapter = navgationDrawAdapter
 
+        val serviceIntent = Intent(this, MainService::class.java)
+        startService(serviceIntent)
 
     }
 
