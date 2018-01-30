@@ -44,7 +44,7 @@ class DatabaseService :
                 val operation = p0.getIntExtra(EXTRA_OPERATION, -1)
                 when (operation) {
                     MODE.CREATE.mode -> {
-                        val result = Db.NOTE.insert(note) > 0
+                        val result = Db.insert(note)
                         if (result) {
                             Log.i(tag, "Note inserted.")
                         } else {
@@ -53,7 +53,7 @@ class DatabaseService :
                         broadcastResult(result)
                     }
                     MODE.EDIT.mode -> {
-                        val result = Db.NOTE.update(note) > 0
+                        val result = Db.update(note)
                         if (result) {
                             Log.i(tag, "Note updated.")
                         } else {
