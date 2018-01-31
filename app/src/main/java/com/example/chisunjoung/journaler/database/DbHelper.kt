@@ -19,8 +19,8 @@ class DbHelper(val dbName: String, val version: Int) : SQLiteOpenHelper(
         val COLUMN_TITLE: String = "title"
         val COLUMN_MESSAGE: String = "message"
         val COLUMN_SCHEDULED: String = "scheduled"
-        val COLUMN_LOCATION_LATITUDE: String = "latitude"
-        val COLUMN_LOCATION_LONGITUDE: String = "longitude"
+        val COLUMN_LOCATION: String = "location"
+
     }
 
     private val tag = "DbHelper"
@@ -31,8 +31,7 @@ class DbHelper(val dbName: String, val version: Int) : SQLiteOpenHelper(
                 $ID integer PRIMARY KEY autoincrement,
                 $COLUMN_TITLE text,
                 $COLUMN_MESSAGE text,
-                $COLUMN_LOCATION_LATITUDE real,
-                $COLUMN_LOCATION_LONGITUDE real
+                $COLUMN_LOCATION text
             )
         """
     private val createTableTodos =  """
@@ -42,8 +41,7 @@ class DbHelper(val dbName: String, val version: Int) : SQLiteOpenHelper(
               $COLUMN_TITLE text,
               $COLUMN_MESSAGE text,
               $COLUMN_SCHEDULED integer,
-              $COLUMN_LOCATION_LATITUDE real,
-              $COLUMN_LOCATION_LONGITUDE real
+              $COLUMN_LOCATION text,
            )
          """
 
