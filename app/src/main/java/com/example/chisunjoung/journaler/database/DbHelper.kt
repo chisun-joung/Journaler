@@ -41,7 +41,7 @@ class DbHelper(val dbName: String, val version: Int) : SQLiteOpenHelper(
               $COLUMN_TITLE text,
               $COLUMN_MESSAGE text,
               $COLUMN_SCHEDULED integer,
-              $COLUMN_LOCATION text,
+              $COLUMN_LOCATION text
            )
          """
 
