@@ -9,7 +9,7 @@ import com.example.chisunjoung.journaler.api.BackendServiceHeaderMap
 import com.example.chisunjoung.journaler.api.JournalerBackendService
 import com.example.chisunjoung.journaler.api.TokenManager
 import com.example.chisunjoung.journaler.api.UserLoginRequest
-import com.example.chisunjoung.journaler.database.Db
+import com.example.chisunjoung.journaler.database.Content
 import com.example.chisunjoung.journaler.execution.TaskExecutor
 import com.example.chisunjoung.journaler.model.Note
 import com.example.chisunjoung.journaler.model.Todo
@@ -97,7 +97,7 @@ class MainService: Service(), DataSynchronization {
                                     if (response.isSuccessful) {
                                         val notes = response.body()
                                         notes?.let {
-                                            Db.insert(notes)
+                                            Content.insert(notes)
                                         }
                                     }
                                 }
@@ -131,7 +131,7 @@ class MainService: Service(), DataSynchronization {
                                     if (response.isSuccessful) {
                                         val todos = response.body()
                                         todos?.let {
-                                            Db.insert(todos)
+                                            Content.insert(todos)
                                         }
                                     }
                                 }

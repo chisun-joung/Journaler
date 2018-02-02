@@ -54,6 +54,10 @@
         <activity android:name=".activity.TodoActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+        <provider
+            android:authorities="com.example.chisunjoung.journaler.provider"
+            android:name="com.example.chisunjoung.journaler.provider.JournalerProvider"
+            android:exported="true" />
     </application>
 
 </manifest>

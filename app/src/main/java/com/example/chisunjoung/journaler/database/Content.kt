@@ -14,8 +14,8 @@ import kotlin.reflect.KClass
  * Created by chisunjoung on 2017. 12. 28..
  */
 
-object Db : Crud <DbModel> {
-    private val tag = "Db"
+object Content : Crud <DbModel> {
+    private val tag = "Content"
     private val version = 1
     private val name = "students"
 
