@@ -44,22 +44,26 @@ class DatabaseService :
                 val operation = p0.getIntExtra(EXTRA_OPERATION, -1)
                 when (operation) {
                     MODE.CREATE.mode -> {
-                        val result = Content.insert(note)
-                        if (result) {
+                        val result = Content.NOTE.insert(note)
+                        if (result > 0) {
                             Log.i(tag, "Note inserted.")
                         } else {
                             Log.e(tag, "Note not inserted.")
                         }
-                        broadcastResult(result)
+                        broadcastId(result)
                     }
                     MODE.EDIT.mode -> {
-                        val result = Content.update(note)
-                        if (result) {
+                        var result = 0
+                        try {
+                            result = Content.NOTE.update(note)
+                        } catch (e: Exception){
+                            Log.e(tag, "Error: $e")
+                        }
+                        if (result > 0) {
                             Log.i(tag, "Note updated.")
                         } else {
                             Log.e(tag, "Note not updated.")
                         }
-                        broadcastResult(result)
                     }
                     else -> {
                         Log.w(tag, "Unknown mode [ $operation ]")
@@ -73,17 +77,9 @@ class DatabaseService :
 
     }
 
-    private fun broadcastResult(result: Boolean) {
-        val intent = Intent()
-        intent.action = Crud.BROADCAST_ACTION
-        intent.putExtra(
-                Crud.BROADCAST_EXTRAS_KEY_CRUD_OPERATION_RESULT,
-                if (result) {
-                    1
-                } else {
-                    0
-                }
-        )
+    private fun broadcastId(id: Long) {
+        val intent = Intent(Crud.BROADCAST_ACTION)
+        intent.putExtra(Crud.BROADCAST_EXTRAS_KEY_CRUD_OPERATION_RESULT, id)
         sendBroadcast(intent)
     }
 
