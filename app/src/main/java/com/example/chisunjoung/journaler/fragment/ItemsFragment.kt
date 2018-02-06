@@ -18,6 +18,9 @@ import android.widget.ListView
 import com.example.chisunjoung.journaler.R
 import com.example.chisunjoung.journaler.activity.NoteActivity
 import com.example.chisunjoung.journaler.activity.TodoActivity
+import com.example.chisunjoung.journaler.adapter.EntryAdapter
+import com.example.chisunjoung.journaler.database.Content
+import com.example.chisunjoung.journaler.execution.TaskExecutor
 import com.example.chisunjoung.journaler.model.MODE
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,6 +32,7 @@ import java.util.*
 class ItemsFragment : BaseFragement(){
     private val TODO_REQUEST = 1
     private val NOTE_REQUEST = 0
+    private val executor = TaskExecutor.getInstance(5)
     override val logTag: String
         get() = "Items fragment"
 
@@ -81,6 +85,13 @@ class ItemsFragment : BaseFragement(){
                     items.setBackgroundColor(R.color.grey_text_middle)
                 }
             }, 3000)
+        }
+        executor.execute {
+            val notes = Content.NOTE.selectAll()
+            val adapter = EntryAdapter(activity, notes)
+            activity.runOnUiThread {
+                view?.findViewById<ListView>(R.id.items)?.adapter = adapter
+            }
         }
     }
     private fun openCreateNote(){

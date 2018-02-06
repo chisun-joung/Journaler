@@ -25,7 +25,7 @@ class JournalerProvider : ContentProvider() {
         private val dataTypeNotes = "notes"
         private val dataTypeTodo = "todo"
         private val dataTypeTodos = "todos"
-        val AUTHORITY = "com.journaler.provider"
+        val AUTHORITY = "com.example.chisunjoung.journaler.provider"
         val URL_NOTE = "content://$AUTHORITY/$dataTypeNote"
         val URL_TODO = "content://$AUTHORITY/$dataTypeTodo"
         val URL_NOTES = "content://$AUTHORITY/$dataTypeNotes"
