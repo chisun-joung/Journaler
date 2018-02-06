@@ -5,8 +5,13 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.app.LoaderManager
+import android.support.v4.content.CursorLoader
+import android.support.v4.content.Loader
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
@@ -22,6 +27,8 @@ import com.example.chisunjoung.journaler.adapter.EntryAdapter
 import com.example.chisunjoung.journaler.database.Content
 import com.example.chisunjoung.journaler.execution.TaskExecutor
 import com.example.chisunjoung.journaler.model.MODE
+import com.example.chisunjoung.journaler.provider.JournalerProvider
+import kotlinx.android.synthetic.main.fragement_items.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,13 +39,45 @@ import java.util.*
 class ItemsFragment : BaseFragement(){
     private val TODO_REQUEST = 1
     private val NOTE_REQUEST = 0
-    private val executor = TaskExecutor.getInstance(5)
+    private var adapter: EntryAdapter? = null
     override val logTag: String
         get() = "Items fragment"
 
-    override fun getLayout(): Int {
+    override fun getLayout() = R.layout.fragement_items
 
-        return R.layout.fragement_items
+    private val loaderCallback = object : LoaderManager.LoaderCallbacks<Cursor>{
+        override fun onLoadFinished(loader: Loader<Cursor>?, cursor:
+        Cursor?) {
+            cursor?.let {
+                if (adapter == null) {
+                    adapter = EntryAdapter(activity, cursor)
+                    items.adapter = adapter
+                } else {
+                    adapter?.swapCursor(cursor)
+                }
+            }
+        }
+
+        override fun onLoaderReset(loader: Loader<Cursor>?) {
+            adapter?.swapCursor(null)
+        }
+
+        override fun onCreateLoader(id: Int, args: Bundle?):
+                Loader<Cursor> {
+            return CursorLoader(
+                    activity,
+                    Uri.parse(JournalerProvider.URL_NOTES),
+                    null,
+                    null,
+                    null,
+                    null
+            )
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        loaderManager.initLoader(0,null, loaderCallback)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -78,20 +117,10 @@ class ItemsFragment : BaseFragement(){
     @SuppressLint("ResourceAsColor")
     override fun onResume() {
         super.onResume()
-        val items = view?.findViewById<ListView>(R.id.items)
-        items?.let {
-            items.postDelayed({
-                if (!activity.isFinishing) {
-                    items.setBackgroundColor(R.color.grey_text_middle)
-                }
-            }, 3000)
-        }
-        executor.execute {
-            val notes = Content.NOTE.selectAll()
-            val adapter = EntryAdapter(activity, notes)
-            activity.runOnUiThread {
-                view?.findViewById<ListView>(R.id.items)?.adapter = adapter
-            }
+        loaderManager.restartLoader(0, null, loaderCallback)
+        val btn = view?.findViewById<FloatingActionButton>(R.id.new_item)
+        btn?.let {
+            animate(btn, false)
         }
     }
     private fun openCreateNote(){
